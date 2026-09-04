@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import MagneticButton from '../components/MagneticButton';
@@ -19,7 +19,15 @@ function RegisterPage() {
     const fromInvite  = !!inviteParam;
 
     const [loading, setLoading] = useState(false);
+    const [inviteValid, setInviteValid] = useState(null); // null = checking, true/false = result
     const [mode, setMode] = useState(fromInvite ? 'join' : 'create');
+
+    useEffect(() => {
+        if (!fromInvite) { setInviteValid(true); return; }
+        authAPI.validateInvite(inviteParam)
+            .then((res) => setInviteValid(res.valid))
+            .catch(() => setInviteValid(false));
+    }, [fromInvite, inviteParam]);
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -102,6 +110,24 @@ function RegisterPage() {
                 transition={{ type: 'spring', stiffness: 100, damping: 22 }}
                 className="relative w-full max-w-md rounded-2xl border border-brand-200/50 bg-brand-50/40 px-8 py-10 shadow-xl shadow-black/[0.06] backdrop-blur-2xl"
             >
+                {inviteValid === false ? (
+                    <div className="flex flex-col items-center gap-4 py-6 text-center">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-50">
+                            <svg className="h-6 w-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 className="text-lg font-semibold text-zinc-900">This invite link has expired</h2>
+                            <p className="mt-1 text-sm text-zinc-500">Ask your admin to send a new invite.</p>
+                        </div>
+                        <Link to="/signin" className="text-sm font-medium text-brand-600 hover:underline">
+                            Back to sign in
+                        </Link>
+                    </div>
+                ) : (
+                <>
+
                 <div className="mb-7 text-center">
                     <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">
                         {fromInvite ? 'Join with invite code' : 'Create an account'}
@@ -167,9 +193,9 @@ function RegisterPage() {
                             value={formData.email}
                             onChange={handleChange}
                             required
-                            readOnly={!!emailParam}
+                            readOnly={fromInvite && !!emailParam}
                             placeholder="Enter email address"
-                            className={`${inputClass} ${emailParam ? 'cursor-not-allowed bg-zinc-100 text-zinc-500' : ''}`}
+                            className={`${inputClass} ${fromInvite && emailParam ? 'cursor-not-allowed bg-zinc-100 text-zinc-500' : ''}`}
                         />
                     </div>
 
@@ -261,6 +287,8 @@ function RegisterPage() {
                         Sign in
                     </Link>
                 </p>
+                </>
+                )}
             </motion.div>
         </div>
     );

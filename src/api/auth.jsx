@@ -39,6 +39,10 @@ export const authAPI = {
 
         return response.data;
     },
+    validateInvite: async (code) => {
+        const response = await api.get('/auth/validate-invite', { params: { code } });
+        return response.data;
+    },
     logout: async () => {
         try {
             await api.post('/auth/logout');

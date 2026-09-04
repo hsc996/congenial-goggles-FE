@@ -304,7 +304,7 @@ function PatientDashboard() {
                 <main className="flex flex-1 flex-col min-w-0">
                     {headerPatient && <PatientHeader patient={headerPatient} rawPatient={selectedPatient} />}
 
-                    <div className="flex flex-1 gap-6 bg-gradient-to-br from-blue-50 to-brand-100 py-5 pl-5 pr-8">
+                    <div className="flex flex-1 gap-6 bg-[#FDFAF4] py-5 pl-5 pr-8">
                         <div className="flex-1 min-w-0 rounded-xl bg-white p-5 shadow-sm">
                             {selectedNote ? (
                                 <HandoverNoteDetail
